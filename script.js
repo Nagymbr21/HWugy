@@ -12,6 +12,17 @@ document.addEventListener('DOMContentLoaded',()=>{
       e.preventDefault();
       const data=new FormData(form);
       status.textContent='Sending...';
+      // Collect values
+      const name = (data.get('name') || '').toString().trim();
+      const message = (data.get('message') || '').toString().trim();
+      // Save submission to localStorage (no backend available)
+      try{
+        const key = 'contact_submissions';
+        const raw = localStorage.getItem(key);
+        const list = raw ? JSON.parse(raw) : [];
+        list.push({ name: name, message: message, date: new Date().toISOString() });
+        localStorage.setItem(key, JSON.stringify(list));
+      }catch(err){ console.error('Could not save submission', err); }
       // Fake async submit (replace with real endpoint)
       setTimeout(()=>{
         status.textContent='Thanks! Your message was received.';

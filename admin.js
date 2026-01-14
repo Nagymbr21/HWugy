@@ -13,8 +13,9 @@
   function showAdmin(){
     loginArea.style.display = 'none';
     content.style.display = '';
-    // initialize documents viewer when admin is shown
+    // initialize documents viewer and contact submissions when admin is shown
     initDocuments();
+    initContactSubmissions();
   }
 
   function showLogin(){
@@ -408,5 +409,93 @@
     }).catch(err=>{
       viewer.innerHTML = '<p style="color:crimson">Could not load document.</p>';
     });
+  }
+
+  // Contact submissions storage & admin UI
+  function loadContactSubmissions(){
+    try{ const raw = localStorage.getItem('contact_submissions'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+  }
+  function saveContactSubmissions(list){
+    try{ localStorage.setItem('contact_submissions', JSON.stringify(list || [])); }catch(e){ console.error('Could not save submissions', e); }
+  }
+
+  function initContactSubmissions(){
+    const container = document.getElementById('submissions-list');
+    if(!container) return;
+    renderContactSubmissions(container, loadContactSubmissions());
+  }
+
+  function renderContactSubmissions(container, list){
+    container.innerHTML = '';
+    if(!Array.isArray(list) || list.length === 0){ container.textContent = 'No submissions yet.'; return; }
+
+    // Create table
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Date</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Name</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Message</th><th style="padding:.25rem;border-bottom:1px solid #ddd"></th></tr>';
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+
+    // show newest first
+    list.slice().reverse().forEach((s, idx)=>{
+      const tr = document.createElement('tr');
+      const dateTd = document.createElement('td');
+      const d = s.date ? new Date(s.date) : null;
+      dateTd.textContent = d ? d.toLocaleString() : '';
+      dateTd.style.padding = '.5rem';
+
+      const nameTd = document.createElement('td');
+      nameTd.textContent = s.name || '';
+      nameTd.style.padding = '.5rem';
+
+      const msgTd = document.createElement('td');
+      msgTd.textContent = s.message || '';
+      msgTd.style.padding = '.5rem';
+
+      const ctrlTd = document.createElement('td');
+      ctrlTd.style.padding = '.5rem';
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.textContent = 'Delete';
+      del.className = 'btn';
+      del.style.background = 'crimson';
+      del.addEventListener('click', ()=>{
+        if(!confirm('Delete this submission?')) return;
+        // find original index in stored list (since we reversed for display)
+        const stored = loadContactSubmissions();
+        const realIdx = stored.length - 1 - idx;
+        stored.splice(realIdx, 1);
+        saveContactSubmissions(stored);
+        renderContactSubmissions(container, stored);
+      });
+      ctrlTd.appendChild(del);
+
+      tr.appendChild(dateTd);
+      tr.appendChild(nameTd);
+      tr.appendChild(msgTd);
+      tr.appendChild(ctrlTd);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    const actions = document.createElement('div');
+    actions.style.marginTop = '.5rem';
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.textContent = 'Clear all';
+    clearBtn.className = 'btn';
+    clearBtn.style.background = 'crimson';
+    clearBtn.style.marginRight = '.5rem';
+    clearBtn.addEventListener('click', ()=>{
+      if(!confirm('Clear all contact submissions?')) return;
+      saveContactSubmissions([]);
+      renderContactSubmissions(container, []);
+    });
+    actions.appendChild(clearBtn);
+
+    container.appendChild(table);
+    container.appendChild(actions);
   }
 })();
