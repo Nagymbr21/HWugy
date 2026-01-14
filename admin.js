@@ -334,6 +334,12 @@
     const viewer = document.getElementById('doc-viewer');
     if(!viewer) return;
     viewer.innerHTML = '<em>Loading…</em>';
+    // Prefer stored content (admin-created or overridden) when available
+    const stored = getStoredDoc(path);
+    if(stored !== null){
+      displayDoc(path, stored);
+      return;
+    }
     fetch(path).then(r=>{
       if(!r.ok) throw new Error('Failed to load');
       return r.text();
