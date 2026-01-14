@@ -120,18 +120,62 @@
       list.appendChild(newBtn);
     }
 
+    const custom = loadCustomDocs();
     const all = getCombinedDocs();
-    all.forEach((d, idx) => {
+    let firstLoaded = false;
+    all.forEach((d) => {
+      const item = document.createElement('div');
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.gap = '.5rem';
+      item.style.marginBottom = '.5rem';
+
       const btn = document.createElement('button');
       btn.textContent = d.title;
-      btn.style.display = 'block';
-      btn.style.margin = '0 0 .5rem 0';
       btn.className = 'btn';
+      btn.style.flex = '1';
       btn.addEventListener('click', ()=> loadDoc(d.path));
-      list.appendChild(btn);
-      // load first doc by default
-      if(idx===0) loadDoc(d.path);
+      item.appendChild(btn);
+
+      // If this is a custom doc, add a Delete control
+      const isCustom = custom.some(c => c.path === d.path);
+      if(isCustom){
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.textContent = 'Delete';
+        del.className = 'btn';
+        del.style.background = 'crimson';
+        del.style.marginLeft = '0';
+        del.style.cursor = 'pointer';
+        del.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          if(confirm('Delete this document? This will remove it and its saved content.')){
+            deleteDoc(d.path);
+          }
+        });
+        item.appendChild(del);
+      }
+
+      list.appendChild(item);
+      if(!firstLoaded){ loadDoc(d.path); firstLoaded = true; }
     });
+  }
+
+  // Check whether a path is a custom admin-created document
+  function isCustomDoc(path){
+    const custom = loadCustomDocs();
+    return custom.some(c => c.path === path);
+  }
+
+  // Delete a custom document: remove metadata and stored content
+  function deleteDoc(path){
+    const custom = loadCustomDocs().filter(c => c.path !== path);
+    saveCustomDocs(custom);
+    removeStoredDoc(path);
+    // refresh list and clear viewer
+    initDocuments();
+    const viewer = document.getElementById('doc-viewer');
+    if(viewer) viewer.innerHTML = '';
   }
 
   // New document creation flow
@@ -326,6 +370,22 @@
       ctrl.appendChild(editBtn);
       ctrl.appendChild(downloadBtn);
       ctrl.appendChild(revertBtn);
+      // If this is a custom doc, add Delete here as well
+      if(isCustomDoc(path)){
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.textContent = 'Delete';
+        delBtn.className = 'btn';
+        delBtn.style.background = 'crimson';
+        delBtn.style.marginLeft = '.5rem';
+        delBtn.style.cursor = 'pointer';
+        delBtn.addEventListener('click', ()=>{
+          if(confirm('Delete this document? This will remove it and its saved content.')){
+            deleteDoc(path);
+          }
+        });
+        ctrl.appendChild(delBtn);
+      }
       viewer.appendChild(ctrl);
     }
   }
