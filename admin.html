@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin — HWugy</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container" style="max-width:720px;margin-top:2rem">
+    <h1>Admin</h1>
+    <div id="login-area">
+      <p>This page requires admin access. Enter the admin password to continue.</p>
+      <form id="admin-login">
+        <label>
+          Password
+          <input id="admin-pass" type="password" required>
+        </label>
+        <div style="margin-top:.5rem">
+          <button class="btn" type="submit">Unlock</button>
+          <a href="index.html" style="margin-left:1rem">Back</a>
+        </div>
+        <p id="admin-status" class="form-status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div id="admin-content" style="display:none">
+      <h2>Admin Dashboard</h2>
+      <p>Only visible to authenticated admins (client-side check).</p>
+      <section>
+        <h3>Site info</h3>
+        <ul>
+          <li>Pages: Home, Features, Contact</li>
+          <li>Local path: d:/logiscool/HWugy</li>
+        </ul>
+      </section>
+      <p>
+        <button id="admin-logout" class="btn">Log out</button>
+      </p>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
