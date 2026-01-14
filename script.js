@@ -19,12 +19,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       },800);
     });
   }
-  // Public documents viewer (read-only, same docs as admin)
-  const docs = [
+  // Public documents viewer (read-only). Includes admin-created docs stored in localStorage.
+  const baseDocs = [
     { title: 'Admin Guide', path: 'docs/guide-intro.md' },
     { title: 'Release Notes', path: 'docs/release-notes.md' },
     { title: 'Policies', path: 'docs/policies.md' }
   ];
+
+  function loadCustomDocs(){
+    try{ const raw = localStorage.getItem('custom_docs'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+  }
+  function getCombinedDocs(){ return baseDocs.concat(loadCustomDocs()); }
+  function getStoredDoc(path){ return localStorage.getItem('doc:' + path); }
 
   function escapeHtml(str){
     return str.replace(/[&<>]/g, function(tag){
@@ -60,7 +66,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     const viewer = document.getElementById('doc-viewer');
     if(!list || !viewer) return;
     list.innerHTML = '';
-    docs.forEach((d, idx) => {
+    const all = getCombinedDocs();
+    all.forEach((d, idx) => {
       const btn = document.createElement('button');
       btn.textContent = d.title;
       btn.style.display = 'block';
@@ -76,6 +83,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     const viewer = document.getElementById('doc-viewer');
     if(!viewer) return;
     viewer.innerHTML = '<em>Loading…</em>';
+    // Prefer stored content (admin-created or overrides)
+    const stored = getStoredDoc(path);
+    if(stored !== null){
+      viewer.innerHTML = renderMarkdown(stored);
+      return;
+    }
     fetch(path).then(r=>{
       if(!r.ok) throw new Error('Failed to load');
       return r.text();

@@ -2,7 +2,7 @@
 // WARNING: This is only suitable for local/dev use. For real protection use server-side auth.
 (function(){
   const ADMIN_KEY = 'hwugy_isAdmin';
-  const CORRECT_PASSWORD = 'changeme'; // change this before sharing or deploy a server check
+  const CORRECT_PASSWORD = 'Fuckcsillag'; // change this before sharing or deploy a server check
 
   const loginForm = document.getElementById('admin-login');
   const status = document.getElementById('admin-status');
@@ -165,6 +165,8 @@
     row.style.marginTop = '.5rem';
 
     const createBtn = document.createElement('button');
+    createBtn.type = 'button';
+    createBtn.style.cursor = 'pointer';
     createBtn.textContent = 'Create';
     createBtn.className = 'btn';
     createBtn.style.marginRight = '.5rem';
@@ -191,6 +193,8 @@
     });
 
     const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.style.cursor = 'pointer';
     cancelBtn.textContent = 'Cancel';
     cancelBtn.className = 'btn';
     cancelBtn.style.marginRight = '.5rem';
