@@ -20,14 +20,18 @@
 
   function showLogin(){
     loginArea.style.display = '';
-    content.style.display = 'none';
+    // keep document content visible so visitors can read documents
+    // (admin controls remain hidden unless signed in)
   }
 
-  if(sessionStorage.getItem(ADMIN_KEY) === '1'){
-    showAdmin();
-  } else {
-    showLogin();
-  }
+  // Make documents visible to everyone; admin login remains available.
+  try{
+    initDocuments();
+  }catch(e){ /* ignore if DOM not ready */ }
+  const adminContentEl = document.getElementById('admin-content');
+  if(adminContentEl) adminContentEl.style.display = '';
+  const loginAreaEl = document.getElementById('login-area');
+  if(loginAreaEl) loginAreaEl.style.display = '';
 
   if(loginForm){
     loginForm.addEventListener('submit', function(e){
