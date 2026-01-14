@@ -49,12 +49,27 @@
     });
   }
 
-  // Documents viewer
-  const docs = [
+  // Documents viewer - base files on disk
+  const baseDocs = [
     { title: 'Admin Guide', path: 'docs/guide-intro.md' },
     { title: 'Release Notes', path: 'docs/release-notes.md' },
     { title: 'Policies', path: 'docs/policies.md' }
   ];
+
+  // Custom (admin-created) docs are saved in localStorage under 'custom_docs'
+  function loadCustomDocs(){
+    try{
+      const raw = localStorage.getItem('custom_docs');
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveCustomDocs(list){
+    localStorage.setItem('custom_docs', JSON.stringify(list || []));
+  }
+  function getCombinedDocs(){
+    const custom = loadCustomDocs();
+    return baseDocs.concat(custom);
+  }
 
   function escapeHtml(str){
     return str.replace(/[&<>]/g, function(tag){
@@ -93,7 +108,20 @@
     const viewer = document.getElementById('doc-viewer');
     if(!list || !viewer) return;
     list.innerHTML = '';
-    docs.forEach((d, idx) => {
+
+    // If admin, show New Document button
+    if(isAdmin()){
+      const newBtn = document.createElement('button');
+      newBtn.textContent = 'New Document';
+      newBtn.className = 'btn';
+      newBtn.style.display = 'block';
+      newBtn.style.margin = '0 0 1rem 0';
+      newBtn.addEventListener('click', ()=> openNewDocForm());
+      list.appendChild(newBtn);
+    }
+
+    const all = getCombinedDocs();
+    all.forEach((d, idx) => {
       const btn = document.createElement('button');
       btn.textContent = d.title;
       btn.style.display = 'block';
@@ -104,6 +132,81 @@
       // load first doc by default
       if(idx===0) loadDoc(d.path);
     });
+  }
+
+  // New document creation flow
+  function slugify(s){
+    return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || Date.now().toString();
+  }
+
+  function openNewDocForm(){
+    const viewer = document.getElementById('doc-viewer');
+    if(!viewer) return;
+    viewer.innerHTML = '';
+
+    const titleIn = document.createElement('input');
+    titleIn.placeholder = 'Title';
+    titleIn.style.display = 'block';
+    titleIn.style.width = '100%';
+    titleIn.style.marginBottom = '.5rem';
+
+    const pathIn = document.createElement('input');
+    pathIn.placeholder = 'Optional path (e.g. local/my-doc.md)';
+    pathIn.style.display = 'block';
+    pathIn.style.width = '100%';
+    pathIn.style.marginBottom = '.5rem';
+
+    const ta = document.createElement('textarea');
+    ta.style.width = '100%';
+    ta.style.minHeight = '40vh';
+    ta.placeholder = '# New Document\n\nStart writing...';
+
+    const row = document.createElement('div');
+    row.style.marginTop = '.5rem';
+
+    const createBtn = document.createElement('button');
+    createBtn.textContent = 'Create';
+    createBtn.className = 'btn';
+    createBtn.style.marginRight = '.5rem';
+    createBtn.addEventListener('click', ()=>{
+      const title = (titleIn.value || 'Untitled').trim();
+      let path = (pathIn.value || '').trim();
+      if(!path){
+        path = 'local/' + slugify(title) + '.md';
+      }
+      // ensure uniqueness
+      const existing = getCombinedDocs().some(d=>d.path === path);
+      if(existing){
+        // append timestamp to make unique
+        path = path.replace(/(\.md)?$/, '-' + Date.now() + '.md');
+      }
+      // save metadata and content
+      const custom = loadCustomDocs();
+      custom.push({ title: title, path: path });
+      saveCustomDocs(custom);
+      saveStoredDoc(path, ta.value || '');
+      // reinit list and show document
+      initDocuments();
+      displayDoc(path, '');
+    });
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.className = 'btn';
+    cancelBtn.style.marginRight = '.5rem';
+    cancelBtn.addEventListener('click', ()=>{
+      // return to first doc
+      const all = getCombinedDocs();
+      if(all.length) loadDoc(all[0].path);
+    });
+
+    row.appendChild(createBtn);
+    row.appendChild(cancelBtn);
+
+    viewer.appendChild(titleIn);
+    viewer.appendChild(pathIn);
+    viewer.appendChild(ta);
+    viewer.appendChild(row);
   }
 
   // Helpers for admin editing
