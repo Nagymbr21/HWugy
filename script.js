@@ -19,4 +19,73 @@ document.addEventListener('DOMContentLoaded',()=>{
       },800);
     });
   }
+  // Public documents viewer (read-only, same docs as admin)
+  const docs = [
+    { title: 'Admin Guide', path: 'docs/guide-intro.md' },
+    { title: 'Release Notes', path: 'docs/release-notes.md' },
+    { title: 'Policies', path: 'docs/policies.md' }
+  ];
+
+  function escapeHtml(str){
+    return str.replace(/[&<>]/g, function(tag){
+      const chars = { '&':'&amp;','<':'&lt;','>':'&gt;' };
+      return chars[tag] || tag;
+    });
+  }
+
+  function renderMarkdown(md){
+    const lines = md.split(/\r?\n/);
+    let out = '';
+    let inPara = false;
+    lines.forEach(line => {
+      if(!line.trim()){
+        if(inPara){ out += '</p>'; inPara = false; }
+        return;
+      }
+      const h = line.match(/^(#{1,6})\s+(.*)/);
+      if(h){ if(inPara){ out += '</p>'; inPara = false; } const level = h[1].length; out += `<h${level}>${escapeHtml(h[2])}</h${level}>`; return; }
+      let html = escapeHtml(line)
+        .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g,'<em>$1</em>')
+        .replace(/\[(.*?)\]\((.*?)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+      if(!inPara){ out += '<p>'; inPara = true; }
+      out += html;
+    });
+    if(inPara) out += '</p>';
+    return out;
+  }
+
+  function initPublicDocs(){
+    const list = document.getElementById('doc-list');
+    const viewer = document.getElementById('doc-viewer');
+    if(!list || !viewer) return;
+    list.innerHTML = '';
+    docs.forEach((d, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = d.title;
+      btn.style.display = 'block';
+      btn.style.margin = '0 0 .5rem 0';
+      btn.className = 'btn';
+      btn.addEventListener('click', ()=> loadDoc(d.path));
+      list.appendChild(btn);
+      if(idx===0) loadDoc(d.path);
+    });
+  }
+
+  function loadDoc(path){
+    const viewer = document.getElementById('doc-viewer');
+    if(!viewer) return;
+    viewer.innerHTML = '<em>Loading…</em>';
+    fetch(path).then(r=>{
+      if(!r.ok) throw new Error('Failed to load');
+      return r.text();
+    }).then(text=>{
+      viewer.innerHTML = renderMarkdown(text);
+    }).catch(err=>{
+      viewer.innerHTML = '<p style="color:crimson">Could not load document.</p>';
+    });
+  }
+
+  // initialize when DOM ready
+  initPublicDocs();
 });
