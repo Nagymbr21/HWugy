@@ -1,0 +1,9 @@
+{
+  "name": "hwugy",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Static HWugy site",
+  "scripts": {
+    "start": "echo \"no server configured\""
+  }
+}
