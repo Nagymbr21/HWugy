@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   const form=document.getElementById('contact-form');
   const status=document.getElementById('form-status');
+  const recipientInput = document.getElementById('contact-recipient');
+  const recipientDisplay = document.getElementById('contact-recipient-display');
   if(form){
     form.addEventListener('submit',e=>{
       e.preventDefault();
@@ -15,8 +17,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       // Collect values
       const name = (data.get('name') || '').toString().trim();
       const message = (data.get('message') || '').toString().trim();
+      const recipient = (data.get('recipient') || '').toString().trim();
       // Save submission: prefer Firebase Realtime DB when configured, otherwise localStorage
-      const submission = { name: name, message: message, date: new Date().toISOString() };
+      const submission = { name: name, message: message, recipient: recipient, date: new Date().toISOString() };
       try{
         if(window.firebase && window.firebaseConfig && window.firebase.apps && window.firebase.apps.length){
           try{
@@ -39,9 +42,31 @@ document.addEventListener('DOMContentLoaded',()=>{
       setTimeout(()=>{
         status.textContent='Thanks! Your message was received.';
         form.reset();
+        if(recipientDisplay) recipientDisplay.textContent = '';
+        if(recipientInput) recipientInput.value = '';
       },800);
     });
   }
+
+  // lawyer contact buttons: prefill contact form recipient and scroll
+  document.querySelectorAll('.contact-lawyer').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const email = btn.getAttribute('data-email') || '';
+      // allow user to open their email client instead
+      if(email && confirm('E-mail kliens megnyitása helyett használja a beépített kapcsolat űrlapot?\n\nOK = e-mail kliens megnyitása, Mégse = űrlap használata')){
+        const subject = encodeURIComponent('Kapcsolat a HWugy weboldalon');
+        window.location.href = `mailto:${email}?subject=${subject}`;
+        return;
+      }
+      if(recipientInput) recipientInput.value = email;
+      if(recipientDisplay) recipientDisplay.textContent = email ? ('Címzett: ' + email) : '';
+      // open contact section
+      const contactSection = document.getElementById('contact');
+      if(contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
+      const message = document.querySelector('#contact-form textarea[name="message"]');
+      if(message) message.focus();
+    });
+  });
 
   // Documents feature removed
   // Documents feature removed

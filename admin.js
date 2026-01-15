@@ -75,7 +75,7 @@
     table.style.width = '100%';
     table.style.borderCollapse = 'collapse';
     const thead = document.createElement('thead');
-    thead.innerHTML = '<tr><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Date</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Name</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Message</th><th style="padding:.25rem;border-bottom:1px solid #ddd"></th></tr>';
+    thead.innerHTML = '<tr><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Date</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Name</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Recipient</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Message</th><th style="padding:.25rem;border-bottom:1px solid #ddd"></th></tr>';
     table.appendChild(thead);
     const tbody = document.createElement('tbody');
 
@@ -90,6 +90,10 @@
       const nameTd = document.createElement('td');
       nameTd.textContent = s.name || '';
       nameTd.style.padding = '.5rem';
+
+      const recTd = document.createElement('td');
+      recTd.textContent = s.recipient || '';
+      recTd.style.padding = '.5rem';
 
       const msgTd = document.createElement('td');
       msgTd.textContent = s.message || '';
@@ -115,6 +119,7 @@
 
       tr.appendChild(dateTd);
       tr.appendChild(nameTd);
+      tr.appendChild(recTd);
       tr.appendChild(msgTd);
       tr.appendChild(ctrlTd);
       tbody.appendChild(tr);

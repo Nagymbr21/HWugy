@@ -82,19 +82,20 @@
         <div class="card">
           <h3>SB József</h3>
           <p>Tapasztalt ügyvéd polgári ügyekben és jogi tanácsadásban.</p>
-          <p><a class="btn" href="gerincem123@gmail.com">Kapcsolat</a></p>
+          <p><button type="button" class="btn contact-lawyer" data-email="gerincem123@gmail.com">Kapcsolat</button></p>
         </div>
         <div class="card">
           <h3>TL Kinga</h3>
           <p>Főleg szerződések és peres ügyek specialistája.</p>
-          <p><a class="btn" href="gerincem123@gmail.com">Kapcsolat</a></p>
+          <p><button type="button" class="btn contact-lawyer" data-email="gerincem123@gmail.com">Kapcsolat</button></p>
         </div>
       </div>
     </section>
 
     <section id="contact" class="contact container">
-      <h2>Kapcsolat jelenleg nem működik</h2>
+      <h2>Kapcsolat</h2>
       <form id="contact-form">
+        <input type="hidden" name="recipient" id="contact-recipient">
         <label>
           Név
           <input type="text" name="name" required>
@@ -103,6 +104,7 @@
           Üzenet
           <textarea name="message" rows="4" required></textarea>
         </label>
+        <p id="contact-recipient-display" style="color:var(--muted);margin:0 .25rem .5rem 0;font-size:.95rem"></p>
         <button type="submit" class="btn">Küldés</button>
         <p id="form-status" class="form-status" aria-live="polite"></p>
       </form>
