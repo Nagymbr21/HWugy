@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ügy részletei — HWugy</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container" style="max-width:900px;margin:2rem auto">
+    <a href="index.html">← Vissza</a>
+    <h1 id="title">Ügy</h1>
+    <p id="summary">Töltés…</p>
+    <div id="details"></div>
+  </div>
+
+  <script>
+    // Simple client-side renderer for static case details.
+    const cases = {
+      '1': {
+        title: 'Ügy #1',
+        summary: 'Rövid leírás az ügy 1-ről.',
+        details: '<p>Részletes információk az Ügy #1-ről. Itt megjeleníthetsz bármilyen leírást, lépéseket, állapotot stb.</p>'
+      },
+      '2': {
+        title: 'Ügy #2',
+        summary: 'Rövid leírás az ügy 2-ről.',
+        details: '<p>Részletes információk az Ügy #2-ről. További adatok és állapotok.</p>'
+      }
+    };
+
+    function getQueryParam(name){
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    const id = getQueryParam('id');
+    const data = id && cases[id] ? cases[id] : null;
+    const titleEl = document.getElementById('title');
+    const summaryEl = document.getElementById('summary');
+    const detailsEl = document.getElementById('details');
+
+    if(data){
+      titleEl.textContent = data.title;
+      summaryEl.textContent = data.summary;
+      detailsEl.innerHTML = data.details;
+    } else {
+      titleEl.textContent = 'Ismeretlen ügy';
+      summaryEl.textContent = 'Nem található részlet ehhez az ügyhez.';
+    }
+  </script>
+</body>
+</html>
