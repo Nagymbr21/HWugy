@@ -47,7 +47,34 @@
       </div>
     </section>
 
-    <!-- Documents section removed -->
+    <section id="ugyek" class="cases container">
+      <h2>Ügyek</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Aktuális ügyek</h3>
+          <p>Itt találhatók a folyamatban lévő és korábbi ügyek. Az admin felületen több részlet található.</p>
+        </div>
+        <div class="card">
+          <h3>Segíteni szeretnél?</h3>
+          <p>Jelentkezz a kapcsolat részen, ha segíteni szeretnél.</p>
+        </div>
+      </div>
+
+      <div class="folder" style="margin-top:1.25rem;border:1px solid #e6e6e6;padding:1rem;border-radius:8px;background:var(--card, #fff)">
+        <h3>Belső mappa (védett)</h3>
+        <p id="folder-msg">Ez a mappa jelszóval védett. Kattints a megnyitáshoz.</p>
+        <div style="margin-top:.5rem">
+          <button id="open-folder" class="btn">Megnyitás</button>
+          <button id="change-folder-pass" class="btn" style="display:none;margin-left:.5rem">Jelszó cseréje</button>
+        </div>
+        <div id="folder-content" style="display:none;margin-top:1rem">
+          <ul>
+            <li>Ügy #1 — rövid leírás</li>
+            <li>Ügy #2 — rövid leírás</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
     <section id="contact" class="contact container">
       <h2>Kapcsolat</h2>
