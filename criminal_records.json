@@ -1,0 +1,14 @@
+[
+    {
+    "name": "Jane Doe",
+    "dob": "1990-05-01",
+    "offense": "Test offense",
+    "notes": "sample record"
+  },
+  {
+    "name": "John Smith",
+    "dob": "1985-11-12",
+    "offense": "Another offense",
+    "notes": ""
+  }
+]

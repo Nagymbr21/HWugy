@@ -15,6 +15,7 @@
     content.style.display = '';
     // initialize contact submissions when admin is shown
     initContactSubmissions();
+    initCriminalRecords();
   }
 
   function showLogin(){
@@ -143,5 +144,64 @@
 
     container.appendChild(table);
     container.appendChild(actions);
+  }
+
+  // Criminal records storage & admin UI (read-only in browser)
+  async function loadCriminalRecords(){
+    // Try to load from a repo file first (requires serving files via HTTP).
+    try{
+      const resp = await fetch('./criminal_records.json', { cache: 'no-store' });
+      if(resp.ok){
+        const data = await resp.json();
+        return Array.isArray(data) ? data : [];
+      }
+    }catch(e){ /* ignore fetch errors and fall back to localStorage */ }
+
+    try{ const raw = localStorage.getItem('criminal_records'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+  }
+
+  function saveCriminalRecords(list){
+    // Keep for backward-compatibility if someone wants to write locally via browser devtools
+    try{ localStorage.setItem('criminal_records', JSON.stringify(list || [])); }catch(e){ console.error('Could not save records', e); }
+  }
+
+  function initCriminalRecords(){
+    const container = document.getElementById('records-list');
+    if(!container) return;
+    // load and render (file or fallback)
+    loadCriminalRecords().then(list => renderCriminalRecords(container, list));
+  }
+
+  function renderCriminalRecords(container, list){
+    container.innerHTML = '';
+    if(!Array.isArray(list) || list.length === 0){ container.textContent = 'No records yet.'; return; }
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Name</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">DOB</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Offense</th><th style="text-align:left;padding:.25rem;border-bottom:1px solid #ddd">Notes</th></tr>';
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+
+    list.forEach(r => {
+      const tr = document.createElement('tr');
+      ['name','dob','offense','notes'].forEach(k=>{
+        const td = document.createElement('td');
+        td.textContent = r[k] || '';
+        td.style.padding = '.5rem';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    const note = document.createElement('p');
+    note.style.marginTop = '.5rem';
+    note.style.color = '#666';
+    note.textContent = 'To add or edit records, open criminal_records.json in Visual Studio Code and edit the JSON array.';
+    container.appendChild(note);
   }
 })();
