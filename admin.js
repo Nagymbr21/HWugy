@@ -201,7 +201,7 @@
     const note = document.createElement('p');
     note.style.marginTop = '.5rem';
     note.style.color = '#666';
-    note.textContent = 'To add or edit records, open criminal_records.json in Visual Studio Code and edit the JSON array.';
+    note.textContent = 'Criminal records are loaded from a static file and cannot be modified here.';
     container.appendChild(note);
   }
 })();
